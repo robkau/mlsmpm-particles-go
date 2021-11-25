@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func GridToParticles(ps *Particles, g Grid) {
+func GridToParticles(ps *Particles, g *Grid) {
 
 	for i, p := range ps.Ps {
 		// reset particle velocity. we calculate it from scratch each step using the grid
@@ -38,7 +38,6 @@ func GridToParticles(ps *Particles, g Grid) {
 		// see APIC paper (https://web.archive.org/web/20190427165435/https://www.math.ucla.edu/~jteran/papers/JSSTS15.pdf), page 6
 		// below equation 11 for clarification. this is calculating C = B * (D^-1) for APIC equation 8,
 		// where B is calculated in the inner loop at (D^-1) = 4 is a constant when using quadratic interpolation functions
-
 		b := mgl64.Mat2{}
 
 		// for all surrounding 9 cells

@@ -10,11 +10,11 @@ type Grid struct {
 	wh    int
 }
 
-func NewGrid(wh int) (Grid, error) {
+func NewGrid(wh int) (*Grid, error) {
 	if wh <= 0 {
-		return Grid{}, errors.New("width and height must be positive")
+		return nil, errors.New("width and height must be positive")
 	}
-	g := Grid{
+	g := &Grid{
 		wh:    wh,
 		cells: make([]Cell, wh*wh),
 	}
@@ -47,8 +47,7 @@ func (g *Grid) UpdateVelocity() {
 	for i, c := range g.cells {
 		if c.mass > 0 {
 			// convert momentum to velocity, apply gravity
-			c.v[0] /= c.mass
-			c.v[1] /= c.mass
+			c.v = c.v.Mul(1 / c.mass)
 			c.v[1] += dt * gravity
 
 			// boundary conditions

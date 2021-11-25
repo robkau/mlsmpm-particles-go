@@ -13,7 +13,7 @@ import (
 )
 
 var width = 600 // window size (pixels)
-var wh = 32     // simulation grid size (logical)
+var wh = 64     // simulation grid size (logical)
 var scaleFactor = float64(width) / float64(wh)
 
 var (
@@ -26,13 +26,17 @@ func main() {
 
 	var ps = mpm.NewParticles()
 	ps.AddSquare(12, 12, wh/4)
-	ps.AddRandomVelocity(7, 10)
-	ps.AddRandomVelocity(-7, 0)
+	ps.AddRandomVelocity(13, 15)
+	ps.AddRandomVelocity(-13, 0)
 
 	grid, err := mpm.NewGrid(wh)
 	if err != nil {
 		panic(fmt.Errorf("create grid: %w", err))
 	}
+
+	// precomputation of particle volumes
+	mpm.ParticlesToGrid(ps, grid)
+	mpm.ComputeParticleVolumes(ps, grid)
 
 	s := &state{
 		ps:   ps,
@@ -50,7 +54,7 @@ func main() {
 type state struct {
 	frameCount int
 	ps         *mpm.Particles
-	grid       mpm.Grid
+	grid       *mpm.Grid
 
 	cursorW mgl64.Vec2 // cursor position in window
 	cursorG mgl64.Vec2 // cursor position in logical mpm simulation grid
@@ -58,6 +62,14 @@ type state struct {
 
 func (s *state) Update() error {
 	s.frameCount++
+
+	// update cursor position(s)
+	cx, cy := ebiten.CursorPosition()
+	s.cursorW[0] = float64(cx)
+	s.cursorW[1] = float64(width) - float64(cy) // ebiten y to world y
+	xG, yG := worldToGrid(s.cursorW[0], s.cursorW[1], scaleFactor)
+	s.cursorG[0] = xG
+	s.cursorG[1] = yG
 
 	// reset grid
 	s.grid.Reset()
@@ -68,16 +80,14 @@ func (s *state) Update() error {
 	// grid velocity update
 	s.grid.UpdateVelocity()
 
+	// g2p
 	mpm.GridToParticles(s.ps, s.grid)
 
-	cx, cy := ebiten.CursorPosition()
-	s.cursorW[0] = float64(cx)
-	s.cursorW[1] = float64(width) - float64(cy) // ebiten y to world y
-	xG, yG := worldToGrid(s.cursorW[0], s.cursorW[1], scaleFactor)
-	s.cursorG[0] = xG
-	s.cursorG[1] = yG
+	// apply cursor interactions
+	mpm.ApplyCursorEffect(xG, yG, 4, s.ps)
 
-	mpm.ApplyCursorEffect(xG, yG, 1, s.ps)
+	// update particle deformations
+	mpm.UpdateDeformationGradients(s.ps)
 
 	return nil
 }

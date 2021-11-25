@@ -1,7 +1,6 @@
 package mpm
 
 import (
-	"fmt"
 	"github.com/go-gl/mathgl/mgl64"
 	"math"
 )
@@ -16,7 +15,6 @@ func ApplyCursorEffect(cx, cy, mouseRadius float64, ps *Particles) {
 			normFactor := dist.Len() / mouseRadius
 			normFactor = math.Pow(math.Sqrt(normFactor), 8)
 			force := dist.Normalize().Mul(normFactor / 2)
-			fmt.Printf("adding force: %v\n", force)
 			p.v = p.v.Add(force)
 		}
 		ps.Ps[i] = p
