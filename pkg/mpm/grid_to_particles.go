@@ -55,10 +55,9 @@ func GridToParticles(ps *Particles, g *Grid) {
 				cellAtIdx := cellPosX*g.wh + cellPosY
 
 				weightedVelocity := g.cells[cellAtIdx].v.Mul(weight)
-
 				term := mgl64.Mat2{
-					weightedVelocity[0] * cellDist[0], weightedVelocity[1] * cellDist[0],
-					weightedVelocity[0] * cellDist[1], weightedVelocity[1] * cellDist[1],
+					weightedVelocity[0] * cellDist[0], weightedVelocity[0] * cellDist[1],
+					weightedVelocity[1] * cellDist[0], weightedVelocity[1] * cellDist[1],
 				}
 
 				b = b.Add(term)

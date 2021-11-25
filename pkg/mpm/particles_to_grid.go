@@ -6,8 +6,8 @@ import (
 )
 
 // Lamé parameters for stress-strain relationship
-const elasticLambda = 10
-const elasticMu = 20
+const elasticLambda = 0.1
+const elasticMu = 2000
 
 // ParticlesToGrid transfers data from particles to grid
 func ParticlesToGrid(ps *Particles, g *Grid) {
