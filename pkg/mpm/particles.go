@@ -21,7 +21,7 @@ func (p *Particles) AddParticle(pc Particle) {
 	p.Ps = append(p.Ps, pc)
 }
 
-func (p *Particles) AddSquare(x0, y0, wh int) {
+func (p *Particles) AddSquare(x0, y0 float64, wh int) {
 	cs, err := coordinate_supplier.NewCoordinateSupplier(coordinate_supplier.CoordinateSupplierOptions{
 		Width:  wh,
 		Height: wh,
@@ -34,8 +34,8 @@ func (p *Particles) AddSquare(x0, y0, wh int) {
 	for x, y, done := cs.Next(); !done; x, y, done = cs.Next() {
 		p.AddParticle(
 			NewParticle(
-				float64(x0+x),
-				float64(y0+y),
+				x0+float64(x),
+				y0+float64(y),
 			))
 	}
 }

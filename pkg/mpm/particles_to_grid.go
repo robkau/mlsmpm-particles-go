@@ -5,30 +5,9 @@ import (
 	"math"
 )
 
-// Lamé parameters for stress-strain relationship
-const elasticLambda = 100
-const elasticMu = 0.1
-
 // ParticlesToGrid transfers data from particles to grid
 func ParticlesToGrid(ps *Particles, g *Grid) {
-
 	for _, p := range ps.Ps {
-		stress := mgl64.Mat2{}
-		j := p.f.Det()
-		volume := p.volume0 * j
-
-		f_T := p.f.Transpose()
-		f_inv_T := f_T.Inv()
-		f_minus_f_inv_T := p.f.Sub(f_inv_T)
-
-		p_term_0 := f_minus_f_inv_T.Mul(elasticMu)
-		p_term_1 := f_inv_T.Mul(math.Log(j) * elasticLambda)
-		p_combined := p_term_0.Add(p_term_1)
-
-		stress = p_combined.Mul2(f_T).Mul(1.0 / j)
-
-		eq16Term0 := stress.Mul(-volume * 4 * dt)
-
 		cellX := int(p.p[0])
 		cellY := int(p.p[1])
 		cellDiff := mgl64.Vec2{
@@ -50,6 +29,40 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 			0.5 * math.Pow(0.5+cellDiff[1], 2),
 		}
 
+		// check surrounding 9 cells to get volume from density
+		var density float64 = 0
+		for gx := 0; gx < 3; gx++ {
+			for gy := 0; gy < 3; gy++ {
+				weight := weights[gx][0] * weights[gy][1]
+				cellPosX := cellX + gx - 1
+				cellPosY := cellY + gy - 1
+				cellAtIdx := cellPosX*g.wh + cellPosY
+				density += g.GetAt(cellAtIdx).mass * weight
+			}
+		}
+		volume := p.mass / density
+
+		pressure := math.Max(-0.1, eosStiffness*(math.Pow(density/restDensity, eosPower)-1))
+
+		// todo doublecheck float2x2
+		stress := mgl64.Mat2{
+			-pressure, 0,
+			0, -pressure,
+		}
+
+		// check copying for p.c earlier
+		dudv := p.c
+		strain := dudv
+
+		trace := strain.Col(1).X() + strain.Col(0).Y()
+		strain.Set(0, 1, trace)
+		strain.Set(1, 0, trace)
+
+		viscosityTerm := strain.Mul(dynamicViscosity)
+		stress = stress.Add(viscosityTerm)
+
+		eq16Term0 := stress.Mul(-volume * 4 * dt)
+
 		// for all surrounding 9 cells
 		for gx := 0; gx < 3; gx++ {
 			for gy := 0; gy < 3; gy++ {
@@ -61,19 +74,10 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 					float64(cellPosX) - p.p[0] + 0.5,
 					float64(cellPosY) - p.p[1] + 0.5,
 				}
-
-				q := p.c.Mul2x1(cellDist)
-
-				// scatter mass and momentum to the grid
 				cellAtIdx := cellPosX*g.wh + cellPosY
 				cell := g.GetAt(cellAtIdx)
-				weightedMass := weight * p.mass
-				cell.mass += weightedMass
-				cell.v = cell.v.Add(p.v.Add(q).Mul(weightedMass))
-
 				momentum := eq16Term0.Mul(weight).Mul2x1(cellDist)
 				cell.v = cell.v.Add(momentum)
-
 				g.SetAt(cellAtIdx, cell)
 			}
 		}
@@ -81,7 +85,7 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 }
 
 func ComputeParticleVolumes(ps *Particles, grid *Grid) {
-	for i, p := range ps.Ps {
+	for _, p := range ps.Ps {
 		// quadratic interpolation weights
 		cellX := int(p.p[0])
 		cellY := int(p.p[1])
@@ -104,19 +108,28 @@ func ComputeParticleVolumes(ps *Particles, grid *Grid) {
 			0.5 * math.Pow(0.5+cellDiff[1], 2),
 		}
 
-		// for all surrounding 9 cells
-		var density float64 = 0
-
 		for gx := 0; gx < 3; gx++ {
 			for gy := 0; gy < 3; gy++ {
 				weight := weights[gx][0] * weights[gy][1]
-				// map 2D to 1D index in grid
-				cellIndex := (cellX+(gx-1))*grid.wh + (cellY + gy - 1)
-				density += grid.GetAt(cellIndex).mass * weight
+
+				cellPosX := cellX + gx - 1
+				cellPosY := cellY + gy - 1
+				cellAtIdx := cellPosX*grid.wh + cellPosY
+
+				cellDist := mgl64.Vec2{
+					float64(cellPosX) - p.p[0] + 0.5,
+					float64(cellPosY) - p.p[1] + 0.5,
+				}
+
+				q := p.c.Mul2x1(cellDist)
+				massContrib := weight * p.mass
+
+				// mass and momentum update
+				cell := grid.GetAt(cellAtIdx)
+				cell.mass += massContrib
+				cell.v = cell.v.Add(p.v.Add(q).Mul(massContrib))
+				grid.SetAt(cellAtIdx, cell)
 			}
 		}
-		// per-particle volume estimate has now been computed
-		p.volume0 = p.mass / density
-		ps.Ps[i] = p
 	}
 }

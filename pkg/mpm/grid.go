@@ -2,8 +2,12 @@ package mpm
 
 import "errors"
 
-var dt = 0.01
-var gravity = -9.8
+const dt = 0.2
+const gravity = -0.3
+const restDensity = 4
+const dynamicViscosity = 0.1
+const eosStiffness = 10
+const eosPower = 4
 
 type Grid struct {
 	cells []Cell
@@ -43,7 +47,7 @@ func (g *Grid) SetAt(index int, cell Cell) {
 	g.cells[index] = cell
 }
 
-func (g *Grid) UpdateVelocity() {
+func (g *Grid) Update() {
 	for i, c := range g.cells {
 		if c.mass > 0 {
 			// convert momentum to velocity, apply gravity

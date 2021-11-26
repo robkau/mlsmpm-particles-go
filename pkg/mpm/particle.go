@@ -5,12 +5,11 @@ import (
 )
 
 type Particle struct {
-	p       mgl64.Vec2 // position 1x2
-	v       mgl64.Vec2 // velocity 1x2
-	f       mgl64.Mat2 // deformation gradient 2x2
-	mass    float64
-	c       mgl64.Mat2 // affine momentum matrix 2x2
-	volume0 float64    // initial volume estimate
+	p    mgl64.Vec2 // position 1x2
+	v    mgl64.Vec2 // velocity 1x2
+	f    mgl64.Mat2 // deformation gradient 2x2
+	mass float64
+	c    mgl64.Mat2 // affine momentum matrix 2x2
 }
 
 func NewParticle(x, y float64) Particle {

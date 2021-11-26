@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func GridToParticles(ps *Particles, g *Grid) {
+func GridToParticles(ps *Particles, g *Grid, cx, cy, mouseRadius float64) {
 
 	for i, p := range ps.Ps {
 		// reset particle velocity. we calculate it from scratch each step using the grid
@@ -75,6 +75,35 @@ func GridToParticles(ps *Particles, g *Grid) {
 		p.p[0] = math.Min(p.p[0], float64(g.wh-2))
 		p.p[1] = math.Max(p.p[1], 1)
 		p.p[1] = math.Min(p.p[1], float64(g.wh-2))
+
+		// cursor effects
+		dist := mgl64.Vec2{
+			p.p[0] - cx, // x distance
+			p.p[1] - cy, // y distance
+		}
+		if dist.Dot(dist) < mouseRadius*mouseRadius {
+			normFactor := dist.Len() / mouseRadius
+			normFactor = math.Pow(math.Sqrt(normFactor), 8)
+			force := dist.Normalize().Mul(normFactor / 2)
+			p.v = p.v.Add(force)
+		}
+
+		// boundaries
+		xn := p.p.Add(p.v)
+		wallMin := float64(3)
+		wallMax := float64(g.wh - 4)
+		if xn[0] < wallMin {
+			p.v[0] += wallMin - xn[0]
+		}
+		if xn[0] > wallMax {
+			p.v[0] += wallMax - xn[0]
+		}
+		if xn[1] < wallMin {
+			p.v[1] += wallMin - xn[1]
+		}
+		if xn[1] > wallMax {
+			p.v[1] += wallMax - xn[1]
+		}
 
 		ps.Ps[i] = p
 	}
