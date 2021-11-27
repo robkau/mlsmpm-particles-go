@@ -8,8 +8,16 @@ import (
 	"github.com/robkau/mlsmpm-particles/pkg/mpm"
 	"image"
 	"image/color"
+	"image/color/palette"
+	"image/draw"
+	"image/gif"
 	"log"
+	"os"
 )
+
+// todo 1: multi phase simulation (per-particle properties, maybe different constitutive models too)
+// todo 2: record to txt data files with particle positions
+// todo 4: optimizations - cache, pool, concurrent processing
 
 var width = 600 // window size (pixels)
 var wh = 64     // simulation grid size (logical)
@@ -37,6 +45,24 @@ func main() {
 	s := &state{
 		ps:   ps,
 		grid: grid,
+		opts: opts{
+			gifFrames:        600,
+			stepsPerGifFrame: 1,
+		},
+	}
+
+	if s.opts.gifFrames > 0 {
+		s.gif = &gif.GIF{
+			Image:     make([]*image.Paletted, s.opts.gifFrames),
+			Delay:     make([]int, s.opts.gifFrames),
+			LoopCount: -1,
+		}
+		outGif, err := os.Create("output.gif")
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.outGif = outGif
+		defer outGif.Close()
 	}
 
 	ebiten.SetWindowSize(width, width)
@@ -54,10 +80,25 @@ type state struct {
 
 	cursorW mgl64.Vec2 // cursor position in window
 	cursorG mgl64.Vec2 // cursor position in logical mpm simulation grid
+
+	opts opts
+
+	gif        *gif.GIF
+	outGif     *os.File
+	atGifFrame int
+}
+
+type opts struct {
+	gifFrames        int
+	stepsPerGifFrame int
 }
 
 func (s *state) Update() error {
 	s.frameCount++
+
+	if s.frameCount%50 == 0 {
+		//s.ps.AddSquare(5, 5, wh / 5)
+	}
 
 	// update cursor position(s)
 	cx, cy := ebiten.CursorPosition()
@@ -90,6 +131,24 @@ func (s *state) Draw(screen *ebiten.Image) {
 
 	//RenderSprites(s.ps, screen)
 	RenderVectors(s.ps, screen)
+
+	if s.opts.gifFrames > 0 && s.atGifFrame < s.opts.gifFrames {
+		// making a gif.
+		if s.opts.stepsPerGifFrame <= 1 || s.frameCount%s.opts.stepsPerGifFrame == 0 {
+			// saving the current simulation step as a gif frame.
+			img := image.NewPaletted(screen.Bounds(), palette.Plan9)
+			draw.Draw(img, img.Bounds(), screen, screen.Bounds().Min, draw.Over)
+			s.gif.Image[s.atGifFrame] = img
+			s.gif.Delay[s.atGifFrame] = 2
+			s.atGifFrame++
+
+			if s.atGifFrame >= s.opts.gifFrames {
+				if err := gif.EncodeAll(s.outGif, s.gif); err != nil {
+					panic(fmt.Sprintf("failed encode gif: %v", err))
+				}
+			}
+		}
+	}
 
 	//RenderCursor(s.cursorW, screen)
 	xW, yW := gridToWorld(s.cursorG[0], s.cursorG[1], scaleFactor)
