@@ -23,7 +23,7 @@ import (
 // todo 4: optimizations - cache, pool, concurrent processing
 
 var width = 800 // window size (pixels)
-var wh = 128    // simulation grid size (logical)
+var wh = 64     // simulation grid size (logical)
 var scaleFactor = float64(width) / float64(wh)
 
 var (
