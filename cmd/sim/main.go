@@ -12,15 +12,18 @@ import (
 	"image/draw"
 	"image/gif"
 	"log"
+	"math/rand"
 	"os"
 )
 
+// todo spawners shooting in particles - 4 directions to make a whirlpool
+// todo particles that expire after X turns
 // todo 1: multi phase simulation (per-particle properties, maybe different constitutive models too)
 // todo 2: record to txt data files with particle positions
 // todo 4: optimizations - cache, pool, concurrent processing
 
-var width = 600 // window size (pixels)
-var wh = 64     // simulation grid size (logical)
+var width = 800 // window size (pixels)
+var wh = 128    // simulation grid size (logical)
 var scaleFactor = float64(width) / float64(wh)
 
 var (
@@ -32,10 +35,10 @@ func main() {
 	emptyImage.Fill(color.White)
 
 	var ps = mpm.NewParticles()
-	ps.AddSquare(4, 4, int(float64(wh)/1.2))
-	ps.AddRandomVelocity(0, 3)
-	ps.AddSquare(4.5, 4.5, int(float64(wh)/1.2))
-	ps.AddRandomVelocity(0, 5)
+	ps.AddSquare(4, 14, int(float64(wh)/4))
+	//ps.AddSquare(60, 14, int(float64(wh)/4), mpm.Fluid)
+	//ps.AddSquare(4, 4, int(float64(wh)/2))
+	//ps.AddRandomVelocity(0, 3)
 
 	grid, err := mpm.NewGrid(wh)
 	if err != nil {
@@ -46,7 +49,7 @@ func main() {
 		ps:   ps,
 		grid: grid,
 		opts: opts{
-			gifFrames:        600,
+			gifFrames:        0,
 			stepsPerGifFrame: 1,
 		},
 	}
@@ -96,8 +99,9 @@ type opts struct {
 func (s *state) Update() error {
 	s.frameCount++
 
-	if s.frameCount%50 == 0 {
-		//s.ps.AddSquare(5, 5, wh / 5)
+	if s.frameCount%1 == 0 {
+		p := mpm.NewParticleV(15, 115, mgl64.Vec2{3.5 + rand.Float64(), 0.5 + rand.Float64()})
+		s.ps.AddParticle(p)
 	}
 
 	// update cursor position(s)
@@ -112,7 +116,7 @@ func (s *state) Update() error {
 	s.grid.Reset()
 
 	// p2g 1
-	mpm.ComputeParticleVolumes(s.ps, s.grid)
+	mpm.UpdateCells(s.ps, s.grid)
 
 	// p2g 2
 	mpm.ParticlesToGrid(s.ps, s.grid)
@@ -122,7 +126,6 @@ func (s *state) Update() error {
 
 	// g2p
 	mpm.GridToParticles(s.ps, s.grid, xG, yG, 10)
-
 	return nil
 }
 

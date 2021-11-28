@@ -28,10 +28,10 @@ func RenderCursor(pos mgl64.Vec2, img *ebiten.Image) {
 
 func RenderVectors(ps *mpm.Particles, img *ebiten.Image) {
 	for _, p := range ps.Ps {
-		x, y := p.Pos()
-		xW, yW := gridToWorld(x, y, scaleFactor)
+		pos := p.Pos()
+		xW, yW := gridToWorld(pos.X(), pos.Y(), scaleFactor)
 		yW = float64(width) - yW // world y to ebiten y
-		drawParticle(img, xW, yW)
+		drawParticle(img, xW, yW, p.Vel().Len())
 	}
 
 	//op := &ebiten.DrawTrianglesOptions{
@@ -86,8 +86,8 @@ func drawEbitenLogo(screen *ebiten.Image, x, y float64) {
 	screen.DrawTriangles(vs, is, emptySubImage, op)
 }
 
-func drawParticle(screen *ebiten.Image, x, y float64) {
-	const unit = 1
+func drawParticle(screen *ebiten.Image, x, y, vmag float64) {
+	const unit = 1.25
 
 	var path vector.Path
 	xf, yf := float32(x), float32(y)
@@ -105,7 +105,7 @@ func drawParticle(screen *ebiten.Image, x, y float64) {
 	for i := range vs {
 		vs[i].SrcX = 1
 		vs[i].SrcY = 1
-		vs[i].ColorR = 0xdb / float32(0xff)
+		vs[i].ColorR = float32(vmag) * 0xdb / float32(0xff)
 		vs[i].ColorG = 0x56 / float32(0xff)
 		vs[i].ColorB = 0x20 / float32(0xff)
 	}

@@ -94,15 +94,19 @@ func GridToParticles(ps *Particles, g *Grid, cx, cy, mouseRadius float64) {
 		wallMax := float64(g.wh - 4)
 		if xn[0] < wallMin {
 			p.v[0] += wallMin - xn[0]
+			p.v[1] *= 1 - boundaryFrictionDamping
 		}
 		if xn[0] > wallMax {
 			p.v[0] += wallMax - xn[0]
+			p.v[1] *= 1 - boundaryFrictionDamping
 		}
 		if xn[1] < wallMin {
 			p.v[1] += wallMin - xn[1]
+			p.v[0] *= 1 - boundaryFrictionDamping
 		}
 		if xn[1] > wallMax {
 			p.v[1] += wallMax - xn[1]
+			p.v[0] *= 1 - boundaryFrictionDamping
 		}
 
 		ps.Ps[i] = p

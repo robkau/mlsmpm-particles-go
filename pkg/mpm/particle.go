@@ -23,6 +23,16 @@ func NewParticle(x, y float64) Particle {
 	}
 }
 
-func (p *Particle) Pos() (x, y float64) {
-	return p.p[0], p.p[1]
+func NewParticleV(x, y float64, v mgl64.Vec2) Particle {
+	p := NewParticle(x, y)
+	p.v = v
+	return p
+}
+
+func (p *Particle) Pos() mgl64.Vec2 {
+	return p.p
+}
+
+func (p *Particle) Vel() mgl64.Vec2 {
+	return p.v
 }

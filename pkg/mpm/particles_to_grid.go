@@ -42,15 +42,12 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 		}
 		volume := p.mass / density
 
+		// fluid constitutive model
 		pressure := math.Max(-0.1, eosStiffness*(math.Pow(density/restDensity, eosPower)-1))
-
-		// todo doublecheck float2x2
 		stress := mgl64.Mat2{
 			-pressure, 0,
 			0, -pressure,
 		}
-
-		// check copying for p.c earlier
 		dudv := p.c
 		strain := dudv
 
@@ -84,7 +81,7 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 	}
 }
 
-func ComputeParticleVolumes(ps *Particles, grid *Grid) {
+func UpdateCells(ps *Particles, grid *Grid) {
 	for _, p := range ps.Ps {
 		// quadratic interpolation weights
 		cellX := int(p.p[0])
