@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-// ParticlesToGrid transfers data from particles to grid
+// ParticlesToGrid transfers momentum from particles to grid
 func ParticlesToGrid(ps *Particles, g *Grid) {
 	for _, p := range ps.Ps {
 		cellX := int(p.p[0])
@@ -81,6 +81,7 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 	}
 }
 
+// UpdateCells transfers mass and velocity from particles to grid
 func UpdateCells(ps *Particles, grid *Grid) {
 	for _, p := range ps.Ps {
 		// quadratic interpolation weights
