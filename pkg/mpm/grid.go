@@ -8,7 +8,7 @@ const restDensity = 4
 const dynamicViscosity = 0.1
 const eosStiffness = 10
 const eosPower = 4
-const boundaryFrictionDamping = 0
+const boundaryFrictionDamping = 0.001
 
 type Grid struct {
 	cells []Cell

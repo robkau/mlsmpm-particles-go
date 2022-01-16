@@ -5,6 +5,13 @@ import (
 	"math"
 )
 
+func weightedVelocityAndCellDistToTerm(weightedVelocity mgl64.Vec2, cellDist mgl64.Vec2) mgl64.Mat2 {
+	return mgl64.Mat2{
+		weightedVelocity[0] * cellDist[0], weightedVelocity[0] * cellDist[1],
+		weightedVelocity[1] * cellDist[0], weightedVelocity[1] * cellDist[1],
+	}
+}
+
 func GridToParticles(ps *Particles, g *Grid, cx, cy, mouseRadius float64) {
 
 	for i, p := range ps.Ps {
@@ -55,10 +62,7 @@ func GridToParticles(ps *Particles, g *Grid, cx, cy, mouseRadius float64) {
 				cellAtIdx := cellPosX*g.wh + cellPosY
 
 				weightedVelocity := g.cells[cellAtIdx].v.Mul(weight)
-				term := mgl64.Mat2{
-					weightedVelocity[0] * cellDist[0], weightedVelocity[0] * cellDist[1],
-					weightedVelocity[1] * cellDist[0], weightedVelocity[1] * cellDist[1],
-				}
+				term := weightedVelocityAndCellDistToTerm(weightedVelocity, cellDist)
 
 				b = b.Add(term)
 				p.v = p.v.Add(weightedVelocity)
