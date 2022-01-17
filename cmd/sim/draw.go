@@ -4,7 +4,7 @@ import (
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/robkau/mlsmpm-particles/pkg/mpm"
+	"github.com/robkau/mlsmpm-particles-go/pkg/mpm"
 )
 
 // RenderCursor draws cursor onto img (expected to already be in window space)

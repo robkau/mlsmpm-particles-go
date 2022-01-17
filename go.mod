@@ -1,4 +1,4 @@
-module github.com/robkau/mlsmpm-particles
+module github.com/robkau/mlsmpm-particles-go
 
 go 1.17
 

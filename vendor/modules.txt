@@ -18,7 +18,6 @@ github.com/go-gl/mathgl/mgl64
 github.com/hajimehoshi/ebiten/v2
 github.com/hajimehoshi/ebiten/v2/ebitenutil
 github.com/hajimehoshi/ebiten/v2/ebitenutil/internal/assets
-github.com/hajimehoshi/ebiten/v2/inpututil
 github.com/hajimehoshi/ebiten/v2/internal/affine
 github.com/hajimehoshi/ebiten/v2/internal/atlas
 github.com/hajimehoshi/ebiten/v2/internal/buffered

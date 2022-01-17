@@ -5,7 +5,7 @@ import (
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/robkau/mlsmpm-particles/pkg/mpm"
+	"github.com/robkau/mlsmpm-particles-go/pkg/mpm"
 	"image"
 	"image/color"
 	"image/color/palette"
@@ -14,16 +14,11 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"time"
 )
 
-// todo spawners shooting in particles - 4 directions to make a whirlpool
-// todo particles that expire after X turns
-// todo 1: multi phase simulation (per-particle properties, maybe different constitutive models too)
-// todo 2: record to txt data files with particle positions
-// todo 4: optimizations - cache, pool, concurrent processing
-
-var width = 800 // window size (pixels)
-var wh = 64     // simulation grid size (logical)
+var width = 1000 // window size (pixels)
+var wh = 256     // simulation grid size (logical)
 var scaleFactor = float64(width) / float64(wh)
 
 var (
@@ -35,10 +30,11 @@ func main() {
 	emptyImage.Fill(color.White)
 
 	var ps = mpm.NewParticles()
-	ps.AddSquare(4, 14, int(float64(wh)/4))
-	//ps.AddSquare(60, 14, int(float64(wh)/4), mpm.Fluid)
+	ps.AddSquare(4, 14, int(float64(wh)/5))
+	ps.AddRandomVelocity(-3, -6)
+	ps.AddSquare(100, 100, int(float64(wh)/5))
+	ps.AddRandomVelocity(2, 10)
 	//ps.AddSquare(4, 4, int(float64(wh)/2))
-	//ps.AddRandomVelocity(0, 3)
 
 	grid, err := mpm.NewGrid(wh)
 	if err != nil {
@@ -49,7 +45,7 @@ func main() {
 		ps:   ps,
 		grid: grid,
 		opts: opts{
-			gifFrames:        0,
+			gifFrames:        3600,
 			stepsPerGifFrame: 1,
 		},
 	}
@@ -60,7 +56,7 @@ func main() {
 			Delay:     make([]int, s.opts.gifFrames),
 			LoopCount: -1,
 		}
-		outGif, err := os.Create("output.gif")
+		outGif, err := os.Create(fmt.Sprintf("output-%d.gif", time.Now().UnixNano()))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -69,7 +65,7 @@ func main() {
 	}
 
 	ebiten.SetWindowSize(width, width)
-	ebiten.SetWindowTitle("mlsmpm-particles")
+	ebiten.SetWindowTitle("mlsmpm-particles-go")
 	if err := ebiten.RunGame(s); err != nil {
 		log.Fatal(err)
 	}
@@ -101,6 +97,15 @@ func (s *state) Update() error {
 
 	if s.frameCount%1 == 0 {
 		p := mpm.NewParticleV(15, 115, mgl64.Vec2{3.5 + rand.Float64(), 0.5 + rand.Float64()})
+		s.ps.AddParticle(p)
+
+		p = mpm.NewParticleV(115, 115, mgl64.Vec2{-0.5 + rand.Float64(), -3.5 + rand.Float64()})
+		s.ps.AddParticle(p)
+
+		p = mpm.NewParticleV(215, 135, mgl64.Vec2{-5.5 + rand.Float64(), 5.5 + rand.Float64()})
+		s.ps.AddParticle(p)
+
+		p = mpm.NewParticleV(115, 215, mgl64.Vec2{3 + 3*rand.Float64(), 2.5 + rand.Float64()})
 		s.ps.AddParticle(p)
 	}
 
