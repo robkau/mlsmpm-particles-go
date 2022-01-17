@@ -6,10 +6,7 @@ import (
 )
 
 func weightedVelocityAndCellDistToTerm(weightedVelocity mgl64.Vec2, cellDist mgl64.Vec2) mgl64.Mat2 {
-	return mgl64.Mat2{
-		weightedVelocity[0] * cellDist[0], weightedVelocity[0] * cellDist[1],
-		weightedVelocity[1] * cellDist[0], weightedVelocity[1] * cellDist[1],
-	}
+	return mgl64.Mat2FromCols(weightedVelocity.Mul(cellDist.X()), weightedVelocity.Mul(cellDist.Y()))
 }
 
 func GridToParticles(ps *Particles, g *Grid, cx, cy, mouseRadius float64) {

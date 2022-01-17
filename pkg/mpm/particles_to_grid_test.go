@@ -43,7 +43,12 @@ func TestUpdateCells(t *testing.T) {
 			require.True(t, FloatEqual(0.0, ps.Ps[0].v.X()))
 			require.True(t, FloatEqual(-1.0, ps.Ps[0].v.Y()))
 			require.True(t, FloatEqual(1.06, ps.Ps[0].mass))
-			require.Equal(t, mgl64.Mat2{-0.4838, 0.01124, -0.0248, 0.169}, ps.Ps[0].c)
+			require.Equal(t,
+				mgl64.Mat2{
+					-0.4838, 0.01124,
+					-0.0248, 0.169,
+				},
+				ps.Ps[0].c)
 
 			// local grid cells mass and velocity should be updated from particle.
 			require.True(t, FloatEqual(0.265, grid.cells[44].mass))

@@ -52,8 +52,8 @@ func ParticlesToGrid(ps *Particles, g *Grid) {
 		strain := dudv
 
 		trace := strain.Col(1).X() + strain.Col(0).Y()
-		strain.Set(0, 1, trace)
 		strain.Set(1, 0, trace)
+		strain.Set(0, 1, trace)
 
 		viscosityTerm := strain.Mul(dynamicViscosity)
 		stress = stress.Add(viscosityTerm)
