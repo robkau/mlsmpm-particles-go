@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿// Original at https://github.com/nialltl/incremental_mpm/tree/master/Assets
+using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Burst;

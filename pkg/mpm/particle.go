@@ -2,6 +2,7 @@ package mpm
 
 import (
 	"github.com/go-gl/mathgl/mgl64"
+	"math"
 )
 
 type Particle struct {
@@ -33,4 +34,25 @@ func (p *Particle) Pos() mgl64.Vec2 {
 
 func (p *Particle) Vel() mgl64.Vec2 {
 	return p.v
+}
+
+func (p *Particle) Equals(o Particle) bool {
+	return Vec2Equal(p.p, o.p) &&
+		Vec2Equal(p.v, o.v) &&
+		Mat2Equal(p.c, o.c) &&
+		p.mass == o.mass
+}
+
+func FloatEqual(a, b float64) bool {
+	return math.Abs(a-b) < 0.0001
+}
+
+func Mat2Equal(a, b mgl64.Mat2) bool {
+	return Vec2Equal(a.Row(0), b.Row(0)) &&
+		Vec2Equal(a.Row(1), b.Row(1))
+}
+
+func Vec2Equal(a, b mgl64.Vec2) bool {
+	return FloatEqual(a.X(), b.X()) &&
+		FloatEqual(a.Y(), b.Y())
 }

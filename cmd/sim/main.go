@@ -12,13 +12,12 @@ import (
 	"image/draw"
 	"image/gif"
 	"log"
-	"math/rand"
 	"os"
 	"time"
 )
 
-var width = 1000 // window size (pixels)
-var wh = 256     // simulation grid size (logical)
+var width = 128 * 8 // window size (pixels)
+var wh = 128        // simulation grid size (logical)
 var scaleFactor = float64(width) / float64(wh)
 
 var (
@@ -30,11 +29,10 @@ func main() {
 	emptyImage.Fill(color.White)
 
 	var ps = mpm.NewParticles()
-	ps.AddSquare(4, 14, int(float64(wh)/5))
-	ps.AddRandomVelocity(-3, -6)
+
 	ps.AddSquare(100, 100, int(float64(wh)/5))
-	ps.AddRandomVelocity(2, 10)
-	//ps.AddSquare(4, 4, int(float64(wh)/2))
+	ps.AddRandomVelocity(-7, 1)
+	ps.AddSquare(4, 4, int(float64(wh)/2))
 
 	grid, err := mpm.NewGrid(wh)
 	if err != nil {
@@ -45,7 +43,7 @@ func main() {
 		ps:   ps,
 		grid: grid,
 		opts: opts{
-			gifFrames:        3600,
+			gifFrames:        0,
 			stepsPerGifFrame: 1,
 		},
 	}
@@ -95,18 +93,8 @@ type opts struct {
 func (s *state) Update() error {
 	s.frameCount++
 
-	if s.frameCount%1 == 0 {
-		p := mpm.NewParticleV(15, 115, mgl64.Vec2{3.5 + rand.Float64(), 0.5 + rand.Float64()})
-		s.ps.AddParticle(p)
-
-		p = mpm.NewParticleV(115, 115, mgl64.Vec2{-0.5 + rand.Float64(), -3.5 + rand.Float64()})
-		s.ps.AddParticle(p)
-
-		p = mpm.NewParticleV(215, 135, mgl64.Vec2{-5.5 + rand.Float64(), 5.5 + rand.Float64()})
-		s.ps.AddParticle(p)
-
-		p = mpm.NewParticleV(115, 215, mgl64.Vec2{3 + 3*rand.Float64(), 2.5 + rand.Float64()})
-		s.ps.AddParticle(p)
+	if s.frameCount%600 == 0 {
+		s.ps.AddSquare(45, 85, int(float64(wh)/5))
 	}
 
 	// update cursor position(s)

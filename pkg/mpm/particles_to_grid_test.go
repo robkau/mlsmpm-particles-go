@@ -3,7 +3,6 @@ package mpm
 import (
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/stretchr/testify/require"
-	"math"
 	"testing"
 )
 
@@ -82,10 +81,6 @@ func TestUpdateCells(t *testing.T) {
 			require.True(t, FloatEqual(0.0, grid.cells[66].v.Y()))
 		})
 	}
-}
-
-func FloatEqual(a, b float64) bool {
-	return math.Abs(a-b) < 0.0001
 }
 
 func TestParticlesToGrid(t *testing.T) {
