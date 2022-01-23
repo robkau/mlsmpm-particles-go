@@ -1,13 +1,18 @@
 # mlsmpm-particles-go
 
-This repository simulates and renders fluid particles in two dimensions.   
+This repository simulates and renders fluid particles in two dimensions.  
+[Click HERE to run the simulation in a browser](https://robkau.github.io/mlsmpm-particles-go/).  
+
 The simulation uses MLS-MPM algorithm (Moving Least Squares Material Point Method).  
 I implemented this by following [nialltl's article on MLS-MPM](https://nialltl.neocities.org/articles/mpm_guide.html) and [matching example code](https://github.com/nialltl/incremental_mpm).
 
-Library [ebiten](https://github.com/hajimehoshi/ebiten) is used to render the output to a window.  
-The simulation is single threaded but still renders the examples in real time on a fast CPU.
+Library [ebiten](https://github.com/hajimehoshi/ebiten) is used to render the output to a window and allows seamless compilation to WASM.   
+The simulation is single threaded but still renders the examples in real time on a fast CPU.  
 
-Build and run the _cmd/sim_ package to interact with realtime simulation.
+Running this in WASM in the browser is about 10x slower than native speed. WebGL support may help when it finally arrives...
+
+Build and run the _cmd/sim_ package to run simulation at native speed.
+
 
 ---
 
