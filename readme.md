@@ -13,14 +13,27 @@ Build and run the _cmd/sim_ package to interact with realtime simulation.
 
 ## Example Videos
 
-![Falling squarelets 1](renders/i-0-30.mp4?raw=true "Falling squarelets 1")
 
-[Falling squarelets 2](renders/i-60-30.mkv?raw=true "Falling squarelets 2")
 
-[Falling squarelets 3](renders/i-120-30.mkv?raw=true "Falling squarelets 3")
+https://user-images.githubusercontent.com/1654124/150659593-25e9022c-a27d-441b-9481-8f8f748cbf85.mov
 
-[Falling squarelets 4](renders/i-180-30.mkv?raw=true "Falling squarelets 4")
 
-[Falling squarelets 5](renders/i-210-30.mkv?raw=true "Falling squarelets 5")
 
-[Streamers](renders/output-s-rendered512-144-interp.mkv "Particle streamers")
+https://user-images.githubusercontent.com/1654124/150659675-e4b4bea0-cd13-49f4-a51f-5066abe4db6e.mov
+
+
+
+https://user-images.githubusercontent.com/1654124/150659679-2d048d5e-98a0-4d85-ad9f-ac23a4e63c24.mov
+
+
+
+https://user-images.githubusercontent.com/1654124/150659685-a4d55341-2a1d-4031-870a-860f0e82c444.mov
+
+
+
+https://user-images.githubusercontent.com/1654124/150659686-dc8009ae-6af3-44e0-8af6-0ed701736cb7.mov
+
+
+
+https://user-images.githubusercontent.com/1654124/150659601-aa409bea-557c-44e2-ae13-d61cc1c9d609.mov
+
